@@ -1,194 +1,327 @@
-🩺 AI Doctor – Vision & Voice Enabled Medical Assistant
+# 🩺 AI Doctor — Multimodal Healthcare AI Agent with Emergency Assistance
 
-An end-to-end AI Doctor application that accepts patient voice input and medical images, analyzes them using state-of-the-art AI models, and responds with a human-like doctor’s voice.
-The system is fully deployed on AWS EC2 and accessible via a Gradio web interface.
+An end-to-end **Multimodal Healthcare AI Agent** that understands patient voice, medical images, conversational context, and emergency situations.
 
-🚀 Live Deployment
+The system performs medical reasoning, enables follow-up chat, generates structured medical reports, and provides emergency assistance by showing nearby hospitals with directions.
 
-Platform: AWS EC2
+The application is containerized with Docker and deployable on cloud platforms such as AWS.
 
-Status: ✅ Running in Production
+---
 
-Interface: Gradio Web UI
+## 🚀 Live Deployment
 
-🧠 System Architecture Overview
+* Platform: AWS EC2 / Docker
+* Status: ✅ Production Ready
+* Interface: Gradio Web UI
+* Architecture: Agent-based multimodal AI system
 
-Input → Processing → AI Reasoning → Voice Response
+---
 
-🎙️ Patient speaks through microphone
+## 🧠 System Overview
 
-🖼️ Optional medical image upload
+Input → Agent Router → AI Reasoning → Response → Report / Emergency Support
 
-🧾 Speech-to-Text transcription
+### Flow
 
-🤖 Multimodal LLM medical reasoning
+* 🎙️ Patient voice input
+* 🖼️ Optional medical image
+* 🧠 Multimodal reasoning (Vision + LLM)
+* 💬 Follow-up conversational memory
+* 📄 Medical report generation (PDF)
+* 🚑 Emergency detection → Nearby hospitals + directions
+* 🔊 Doctor-like voice response
 
-🔊 Doctor-like voice output
+---
 
-🛠️ Tech Stack
-Frontend / UI
+## 🤖 Core Agents (Agentic Architecture)
 
-Gradio (Web-based interactive UI)
+### 1️⃣ Medical Reasoning Agent
 
-Speech Processing
+Handles:
 
-SpeechRecognition
+* Voice transcription
+* Image understanding
+* Doctor-style response generation
 
-PyAudio
+---
 
-FFmpeg
+### 2️⃣ Conversation / Follow-up Agent
 
-Whisper (via Groq API)
+Maintains session memory and enables:
 
-AI Models
+* Multi-turn medical chat
+* Context-aware follow-ups
+* Disease guidance
 
-Speech-to-Text: Whisper Large v3 (Groq)
+---
 
-Vision + Reasoning: LLaMA Vision Models
+### 3️⃣ Report Agent
 
-Text-to-Speech: ElevenLabs, gTTS
+Generates structured medical PDF reports and stores them per user.
 
-Backend
+Features:
 
-Python
+* Session summary
+* Downloadable reports
+* Report history
 
-Groq API
+---
 
-ElevenLabs API
+### 4️⃣ Emergency Agent ⭐
 
-Deployment
+Detects emergency intent (e.g. bleeding, chest pain).
 
-AWS EC2
+Provides:
 
-Linux Server
+* Nearby hospitals (Google Places API)
+* Hospital phone numbers
+* Google Maps directions links
+* Location-based assistance
 
-Virtual Environment (venv)
+---
 
-Environment Variables (.env)
+### 5️⃣ Agent Router ⭐
 
-📂 Project Structure
+Classifies user intent:
+
+* Normal medical chat
+* Emergency
+* Report request
+
+Routes the request to the correct agent.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend / UI
+
+* Gradio (agent UI)
+* Chat interface with session state
+* File + audio components
+
+---
+
+### Speech Processing
+
+* Groq Whisper Large v3
+* FFmpeg
+* PyDub
+
+---
+
+### AI Models
+
+* Vision Reasoning: LLaMA Vision models
+* STT: Whisper (Groq)
+* TTS: ElevenLabs
+
+---
+
+### Backend
+
+* Python
+* Agent-based architecture
+* Groq API
+* Google Maps API (Places + Directions)
+
+---
+
+### Database ⭐
+
+* SQLAlchemy
+* User authentication
+* Report storage
+* Report history
+
+---
+
+### Deployment
+
+* Docker
+* AWS EC2
+* Environment variables (.env)
+
+---
+
+## 📂 Project Structure
+
+```
 doctor_ai/
-│
-├── gradio_app.py              # Main Gradio UI entry point
-├── brain_of_the_doctor.py     # Vision + LLM reasoning logic
-├── voice_of_the_patient.py   # Audio recording & transcription
-├── voice_of_the_doctor.py    # Text-to-Speech generation
-│
+
+├── app.py
+├── agent_router.py
+├── emergency_agent.py
+├── disease_chat.py
+├── doctor_report.py
+├── report_storage.py
+├── auth.py
+├── database.py
+
+├── brain_of_the_doctor.py
+├── voice_of_the_patient.py
+├── voice_of_the_doctor.py
+
 ├── requirements.txt
-├── .env                       # API keys (not committed)
-├── README.md
-└── venv/
+├── Dockerfile
+├── .env
+└── README.md
+```
 
-🎙️ Voice of the Patient (Speech-to-Text)
+---
 
-File: voice_of_the_patient.py
+## 🔐 Authentication
 
-Records patient voice using microphone
+New capability:
 
-Converts audio to MP3
+* Signup / Login
+* User-specific reports
+* Session-based experience
 
-Transcribes speech using Groq Whisper Large v3
+---
 
-Outputs clean English text for reasoning
+## 🚑 Emergency Assistance
 
-🧠 Brain of the Doctor (Vision + AI Reasoning)
+When emergency is detected, the system automatically:
 
-File: brain_of_the_doctor.py
+* Finds nearby hospitals
+* Fetches phone numbers
+* Generates Google Maps direction links
+* Displays results inside chat UI
 
-Encodes medical images (Base64)
+Uses:
 
-Sends patient text + image to a vision-enabled LLM
+* Google Places API
+* Place Details API
+* Maps Directions links
 
-Generates concise, doctor-like medical responses
+---
 
-Avoids AI disclaimers and markdown formatting
+## 📄 Medical Report System
 
-🔊 Voice of the Doctor (Text-to-Speech)
+* Generates PDF summary
+* Saves per user
+* Users can load previous reports
+* Portfolio-ready feature
 
-File: voice_of_the_doctor.py
+---
 
-Converts AI-generated medical text into voice
+## 🔊 Voice System
+
+Patient → Speech → Text → AI reasoning → Doctor voice
 
 Supports:
 
-ElevenLabs (realistic doctor voice)
+* ElevenLabs realistic voice
+* Audio playback in UI
 
-gTTS (fallback option)
+---
 
-Outputs playable MP3 audio
+## 🔐 Environment Variables
 
-🖥️ Gradio Web Interface
+Create a `.env` file:
 
-File: gradio_app.py
-
-UI Components:
-
-🎙️ Microphone audio input
-
-🖼️ Image upload
-
-📄 Transcribed patient text
-
-🧠 Doctor’s medical response
-
-🔊 Audio playback of doctor’s voice
-
-Flow:
-Audio + Image → AI Processing → Text Response → Voice Output
-
-🔐 Environment Variables
-
-Create a .env file:
-
+```
 GROQ_API_KEY=your_groq_api_key
 ELEVEN_API_KEY=your_elevenlabs_api_key
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+```
 
+⚠️ Never commit `.env` to GitHub
 
-⚠️ Never commit .env to GitHub
+---
 
-🏗️ Deployment on AWS EC2
-Steps Followed:
+## 🐳 Docker Deployment
 
-Launch EC2 (Ubuntu)
+Build image:
 
-Install Python, FFmpeg, PortAudio
+```
+docker build -t ai-doctor .
+```
 
-Create virtual environment
+Run container:
 
-Install dependencies
+```
+docker run -p 7860:7860 --env-file .env ai-doctor
+```
 
-Set environment variables
+---
 
-Run Gradio app
+## 🏗️ AWS Deployment (High Level)
 
-Expose port via Security Group
+Steps:
 
-▶️ How to Run Locally
-git clone <repo-url>
+1. Launch EC2 (Ubuntu)
+2. Install Docker
+3. Clone repository
+4. Add `.env`
+5. Build Docker image
+6. Run container
+7. Open port 7860 in security group
+
+---
+
+## ▶️ Run Locally
+
+```
+git clone <repo>
 cd doctor_ai
+
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
-python gradio_app.py
 
+pip install -r requirements.txt
+python app.py
+```
 
 App runs at:
 
+```
 http://127.0.0.1:7860
+```
 
-⚠️ Disclaimer
+---
 
-This project is built strictly for educational and learning purposes.
-It does not replace professional medical advice.
+## 🧪 Key Highlights (Resume / Hackathon Strength)
 
-📌 Key Highlights
+* Agentic AI architecture (not a chatbot)
+* Multimodal healthcare AI
+* Emergency AI assistant
+* Medical report generation
+* User authentication + persistence
+* Google Maps integration
+* Dockerized deployment
+* Production-ready architecture
 
-Multimodal AI (Voice + Vision)
+---
 
-Realistic doctor voice responses
+## 🏆 Why This Project Is Advanced
 
-Production deployment on AWS EC2
+Most projects stop at:
 
-Clean modular architecture
+* Chatbot demo
+* Single model demo
 
-Resume & portfolio ready project
+This project includes:
+
+* Multi-agent system
+* Memory
+* Emergency reasoning
+* Real-world API integration
+* Full stack architecture
+* Deployment ready
+
+---
+
+## ⚠️ Disclaimer
+
+This project is built strictly for educational and research purposes and does not replace professional medical advice.
+
+---
+
+## 👨‍💻 Author
+
+Vivekananda Sahoo
+
+Multimodal Healthcare AI Agent
+Built for hackathons
