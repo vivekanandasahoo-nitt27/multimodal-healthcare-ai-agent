@@ -44,3 +44,7 @@ Thumbs.db
 # Node / temp
 # --------------------
 node_modules/
+
+
+media/video.mp4
+media/video2.mp4

@@ -10,7 +10,7 @@ The application is containerized with Docker and deployable on cloud platforms s
 
 ## 🚀 Live Deployment
 
-* Platform: AWS EC2 / Docker
+* Platform:  Docker
 * Status: ✅ Production Ready
 * Interface: Gradio Web UI
 * Architecture: Agent-based multimodal AI system
