@@ -1,26 +1,35 @@
 FROM python:3.10-slim
 
-# Prevent Python issues in Docker
+# ---------- ENV ----------
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PIP_DEFAULT_TIMEOUT=1000
+ENV GRADIO_ANALYTICS_ENABLED=False
 
-
-# System deps (audio + report libs)
+# ---------- SYSTEM DEPENDENCIES ----------
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     gcc \
+    g++ \
     build-essential \
+    libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# ---------- WORKDIR ----------
 WORKDIR /app
 
+# ---------- INSTALL PYTHON DEPS (layer cache friendly) ----------
 COPY requirements.txt .
 
-RUN pip install --upgrade pip \
- && pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel \
+ && pip install --no-cache-dir -r requirements.txt
 
+# ---------- COPY PROJECT ----------
 COPY . .
 
+# ---------- PORT ----------
 EXPOSE 7860
 
-CMD ["python", "app.py"]
+# ---------- START APP ----------
+CMD ["python",  "-u","app.py"]
