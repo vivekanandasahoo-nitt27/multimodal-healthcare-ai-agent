@@ -15,6 +15,8 @@ from emergency_agent import build_emergency_response
 from dotenv import load_dotenv
 load_dotenv()
 
+from who_rag import retrieve_who_context
+
 
 SYSTEM_PROMPT = """
 You have to act as a professional doctor i know you are not but this is for learning purpose
@@ -61,10 +63,21 @@ def process_initial(audio_filepath, image_filepath, state):
     if not patient_text.strip():
         patient_text = "Analyze this medical image."
 
-    final_query = f"{SYSTEM_PROMPT}\nPatient says: {patient_text}"
+    who_context = retrieve_who_context(patient_text)
+    enhanced_prompt = f"""
+    {SYSTEM_PROMPT}
+
+    Use established emergency medical care standards internally when forming your response.
+    Do not mention WHO explicitly.
+
+    Relevant Emergency Guidelines:
+    {who_context}
+
+    Patient says: {patient_text}
+    """
 
     if image_filepath:
-        doctor_response = analyze_image_with_query(final_query, image_filepath)
+        doctor_response = analyze_image_with_query(enhanced_prompt, image_filepath)
     else:
         doctor_response = "Please upload an image."
 
@@ -274,7 +287,7 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
 )
 
 demo.launch(
-    server_name="0.0.0.0",
+    server_name="127.0.0.1",
     server_port=7860,
-    share=False
+    share=True
 )
