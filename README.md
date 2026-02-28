@@ -9,8 +9,8 @@ The application is containerized with Docker and deployable on cloud platforms s
 ---
 
 ## 🚀 Live Deployment
-
-* Platform:  Docker
+* Live Server: http://44.197.103.98/
+* Platform:  AWS EC2 ,Docker
 * Status: ✅ Production Ready
 * Interface: Gradio Web UI
 * Architecture: Agent-based multimodal AI system
@@ -316,7 +316,7 @@ This project includes:
 ## ⚠️ Disclaimer
 
 This project is built strictly for educational and research purposes and does not replace professional medical advice.
-
+It work as a medical assistance and guide in emergency
 ---
 
 ## 👨‍💻 Author
