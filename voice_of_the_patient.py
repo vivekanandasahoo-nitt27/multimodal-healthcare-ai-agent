@@ -13,7 +13,7 @@ def transcribe_with_groq(audio_filepath, stt_model="whisper-large-v3"):
             result = client.audio.transcriptions.create(
                 model=stt_model,
                 file=audio,
-                language="en"
+                language=None
             )
         return result.text
 

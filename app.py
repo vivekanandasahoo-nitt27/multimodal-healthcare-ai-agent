@@ -53,7 +53,7 @@ def login(email, password):
     return user.id, "Login success"
 
 
-def process_initial(audio_filepath, image_filepath, state):
+def process_initial(audio_filepath, image_filepath, language, state):
     state = state or []
 
     if not audio_filepath and not image_filepath:
@@ -61,11 +61,16 @@ def process_initial(audio_filepath, image_filepath, state):
 
     patient_text = transcribe_with_groq(audio_filepath)
     if not patient_text.strip():
-        patient_text = "Analyze this medical image."
+        patient_text = f"Analyze this medical image. Respond in {language}."
 
     who_context = retrieve_who_context(patient_text)
     enhanced_prompt = f"""
     {SYSTEM_PROMPT}
+    IMPORTANT:
+    Respond ONLY in {language}.
+    All explanations, medical advice, and instructions must be in {language}.
+
+    
 
     Use established emergency medical care standards internally when forming your response.
     Do not mention WHO explicitly.
@@ -81,7 +86,7 @@ def process_initial(audio_filepath, image_filepath, state):
     else:
         doctor_response = "Please upload an image."
 
-    audio_path = text_to_speech_with_elevenlabs(doctor_response)
+    audio_path = text_to_speech_with_elevenlabs(doctor_response, language)
 
     state = [
         {"question": patient_text, "answer": doctor_response}
@@ -217,6 +222,15 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
         with gr.Tab("🩺 Consultation"):
 
             with gr.Row():
+                language_selector = gr.Dropdown(
+                choices=[
+                    "English","Hindi","Tamil","Telugu","Odia",
+                    "Bengali","Kannada","Malayalam","Marathi","Gujarati"
+                ],
+                value="English",
+                label="Patient Language"
+                )
+
                 audio_input = gr.Audio(
                     sources=["microphone", "upload"],
                     type="filepath",
@@ -261,7 +275,7 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
     
     submit_btn.click(
         fn=process_initial,
-        inputs=[audio_input, image_input, session_state],
+        inputs=[audio_input, image_input, language_selector, session_state],
         outputs=[user_message, chatbot, audio_output, session_state],
         api_name=False
     )
