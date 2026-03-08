@@ -30,6 +30,18 @@ class Report(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="reports")
+    
+    
+class HealthMetric(Base):
+    __tablename__ = "health_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    metric_name = Column(String)
+    value = Column(String)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 def init_db():

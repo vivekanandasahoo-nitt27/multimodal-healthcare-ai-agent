@@ -11,6 +11,11 @@ from auth import create_user, authenticate_user
 from report_storage import get_user_reports
 from agent_router import classify_intent
 from emergency_agent import build_emergency_response
+from report_analyzer import analyze_medical_report
+from severity_engine import classify_bp, classify_sugar, classify_chol
+from health_metrics import save_metric, get_metric_history
+import json
+import pandas as pd
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -51,6 +56,87 @@ def login(email, password):
     if not user:
         return None, "Invalid credentials"
     return user.id, "Login success"
+
+
+def process_health_dashboard(report_image, user_id):
+
+    result = analyze_medical_report(report_image)
+
+    data = result
+    if "error" in data:
+        return data["error"], "", "", None, None, None
+
+    sys = data.get("systolic_bp")
+    dia = data.get("diastolic_bp")
+    sugar = data.get("blood_sugar")
+    chol = data.get("cholesterol")
+
+    if not all([sys, dia, sugar, chol]):
+        return "Extraction failed", "", "", None, None, None
+
+    bp_status = classify_bp(sys, dia)
+    sugar_status = classify_sugar(sugar)
+    chol_status = classify_chol(chol)
+
+    save_metric(user_id, "blood_pressure", f"{sys}/{dia}")
+    save_metric(user_id,"blood_sugar",sugar)
+    save_metric(user_id,"cholesterol",chol)
+
+    bp_rows = get_metric_history(user_id,"blood_pressure")
+    sugar_rows = get_metric_history(user_id,"blood_sugar")
+    chol_rows = get_metric_history(user_id,"cholesterol")
+    
+    bp_rows = sorted(bp_rows, key=lambda x: x.created_at)
+    sugar_rows = sorted(sugar_rows, key=lambda x: x.created_at)
+    chol_rows = sorted(chol_rows, key=lambda x: x.created_at)
+
+    
+    if len(bp_rows) < 2:
+        bp_history = None
+    else:
+        bp_history = pd.DataFrame([
+            {"date": r.created_at, "value": int(r.value.split("/")[0])}
+            for r in bp_rows
+        ])
+
+    
+    if len(sugar_rows) < 2:
+        sugar_history = None
+    else:
+        sugar_history = pd.DataFrame([
+            {"date": r.created_at, "value": int(r.value)}
+            for r in sugar_rows
+        ])
+
+    if len(chol_rows) < 2:
+        chol_history = None
+    else:
+        chol_history = pd.DataFrame([
+            {"date": r.created_at, "value": int(r.value)}
+            for r in chol_rows
+        ])
+
+    bp_card = f"""
+    ### Blood Pressure
+    {bp_status}
+
+    {sys}/{dia} mmHg
+    """
+    sugar_card = f"""
+    ### Blood Sugar
+    {sugar_status}
+
+    {sugar} mg/dL
+    """
+    chol_card = f"""
+    ### Cholesterol
+    {chol_status}
+
+    {chol} mg/dL
+    """
+    
+
+    return bp_card, sugar_card, chol_card, bp_history, sugar_history, chol_history
 
 
 def process_initial(audio_filepath, image_filepath, language, state):
@@ -250,9 +336,49 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
 
 
     
-        with gr.Tab("📄 Previous Reports"):
+        with gr.Tab("📊 My Health Dashboard"):
+            
 
-            gr.Markdown("## Previous Reports")
+                
+
+            # Upload report
+            report_upload = gr.Image(type="filepath", label="Upload Medical Report")
+            analyze_report_btn = gr.Button("Analyze Report")
+
+            gr.Markdown("---")
+
+            # Health metrics row
+            with gr.Row():
+                bp_card = gr.Markdown("### Blood Pressure\nNo Data")
+                sugar_card = gr.Markdown("### Blood Sugar\nNo Data")
+                chol_card = gr.Markdown("### Cholesterol\nNo Data")
+
+            gr.Markdown("### Health Trends")
+            
+            with gr.Row():
+                bp_graph = gr.LinePlot(
+                    x="date",
+                    y="value",
+                    title="Blood Pressure Trend"
+                )
+
+                sugar_graph = gr.LinePlot(
+                    x="date",
+                    y="value",
+                    title="Blood Sugar Trend"
+                )
+
+                chol_graph = gr.LinePlot(
+                    x="date",
+                    y="value",
+                    title="Cholesterol Trend"
+                )
+            gr.Markdown("---")
+
+
+            
+
+            gr.Markdown("## Previous Medical Reports")
 
             load_reports_btn = gr.Button("Load My Reports")
             reports_list = gr.Files(label="Your Previous Reports")
@@ -298,7 +424,19 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
     fn=load_reports,
     inputs=[user_state],
     outputs=[reports_list]
-)
+    )
+    analyze_report_btn.click(
+    fn=process_health_dashboard,
+    inputs=[report_upload, user_state],
+    outputs=[
+        bp_card,
+        sugar_card,
+        chol_card,
+        bp_graph,
+        sugar_graph,
+        chol_graph
+    ]
+    )
 
 demo.launch(
     server_name="127.0.0.1",
