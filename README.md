@@ -6,6 +6,9 @@ The system performs medical reasoning, enables follow-up chat, generates structu
 
 The application is containerized with Docker and deployable on cloud platforms such as AWS.
 
+## Project development history:
+https://github.com/vivekanandasahoo-nit27/multimodal-healthcare-ai-agent/commits/main
+
 ---
 
 ## 🚀 Live Deployment
