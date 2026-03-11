@@ -6,7 +6,12 @@ The system performs medical reasoning, enables follow-up chat, generates structu
 
 The application is containerized with Docker and deployable on cloud platforms such as AWS.
 
+
 ## Project development history:
+Built by: Vivekananda Sahoo  
+National Institute of Technology Tiruchirappalli 
+
+Development commits:
 https://github.com/vivekanandasahoo-nitt27/multimodal-healthcare-ai-agent/commits/main/
 
 ---
@@ -209,9 +214,23 @@ Uses:
 
 ---
 
-## 🔊 Voice System
+## 📊 Personal Health Dashboard
+
+* Tracks blood pressure, blood sugar, and cholesterol
+* Visualizes health trends with charts
+* Shows severity indicators for abnormal values
+* Integrated with previous medical reports
+
+---
+
+## 🔊 Voice & Multilingual System
 
 Patient → Speech → Text → AI reasoning → Doctor voice
+
+* Voice input via microphone
+* Multilingual speech understanding
+* AI responses in selected language
+* Doctor-like voice output (TTS)
 
 Supports:
 
